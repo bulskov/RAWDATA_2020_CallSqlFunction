@@ -4,6 +4,31 @@ using Npgsql;
 
 namespace CallSqlFunction
 {
+    /*
+         
+         Assume that the following function is present in the DB:
+         
+            CREATE OR REPLACE FUNCTION search (pattern VARCHAR) 
+               RETURNS TABLE (
+                  p_id INT,
+	               p_name VARCHAR
+            ) 
+            AS $$
+            BEGIN
+               RETURN QUERY SELECT
+                  productid,
+	              productname
+               FROM
+                  products
+               WHERE
+                  productname LIKE pattern;
+            END; $$ 
+             
+            LANGUAGE 'plpgsql';
+         
+            You can the use either ADO or Entity Framework to execute the function.
+         */
+    
     class Program
     {
         static void Main(string[] args)
