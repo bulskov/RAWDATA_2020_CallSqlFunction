@@ -27,8 +27,16 @@ namespace CallSqlFunction
             LANGUAGE 'plpgsql';
          
             You can the use either ADO or Entity Framework to execute the function.
+
+             CREATE OR REPLACE FUNCTION insertcategory(id int, name varchar, description varchar)
+              RETURNS void AS $$
+            BEGIN
+               insert into categories values(id, name, desc);
+            END
+            $$  
+            LANGUAGE plpgsql;
          */
-    
+
     class Program
     {
         static void Main(string[] args)
@@ -38,6 +46,7 @@ namespace CallSqlFunction
             UseAdo(connectionString);
             UseEntityFramework(connectionString);
             UseAdoViaEntityFramework(connectionString);
+            UseEntityFrameworkToCallFunction(connectionString);
 
 
         }
@@ -73,6 +82,27 @@ namespace CallSqlFunction
                 Console.WriteLine($"{reader.GetInt32(0)}, {reader.GetString(1)}");
             }
 
+        }
+
+        private static void UseEntityFrameworkToCallFunction(string connectionString)
+        {
+            Console.WriteLine("ADO from Entity Framework");
+            var ctx = new NorthwindContex(connectionString);
+
+            int id = 101;
+            string name = "testing";
+            string description = "testing desc";
+
+            ctx.Database.ExecuteSqlInterpolated($"select insertcategory({id},{name},{description})");
+
+            var category = ctx.Categories.Find(id);
+
+            Console.WriteLine("Newly inserted category:");
+            Console.WriteLine($"Id={category.Id}, Name={category.Name}, Description={category.Description}");
+
+            ctx.Categories.Remove(category);
+
+            ctx.SaveChanges();
         }
 
         private static void UseAdo(string connectionString)
